@@ -102,9 +102,10 @@
 
 import { defineComponent, reactive, ref, toRefs } from 'vue';
 import axios from "axios";
+import { useMenu } from '../../../store/use-menu.js';
 export default defineComponent({
     setup() {
-
+        useMenu().onSlectedKeys(['profile-index']);
 
         const dataUser = reactive({
             email: '',

@@ -7,25 +7,28 @@ export const useCartStore = defineStore({
         lastUpdated: null, // Thêm trường thời gian
     }),
     actions: {
-        addToCart(product) {
-            const existingProduct = this.products.find(p => p.id === product.id);
+        addToCart(product, color, size) {
+            const existingProduct = this.products.find(p => p.id === product.id && p.color === color && p.size === size);
+            
+            
             if (existingProduct) {
-                existingProduct.quantity++
+                    existingProduct.quantity++
             } else {
 
                 this.products.push({
                     ...product,
                     'quantity': 1,
+                    color,
+                    size
                 })
-
             }
-            // this.logCartContents();
+            this.logCartContents();
             this.updateLocalStorage();
         },
-        //kiểm tra thông tin giỏ hàng
-        // logCartContents() {
-        //     console.log('Cart contents:', this.products);
-        // },
+        // kiểm tra thông tin giỏ hàng
+        logCartContents() {
+            console.log('Cart contents:', this.products);
+        },
 
         //lưu giỏ hàng
         initializeCart() {
@@ -62,7 +65,7 @@ export const useCartStore = defineStore({
             this.lastUpdated = null;
             localStorage.removeItem('cart');
             localStorage.removeItem('cartLastUpdated');
-          },
+        },
     }
 
 

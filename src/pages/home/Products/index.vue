@@ -5,10 +5,10 @@
                 <a-carousel arrows dots-class="slick-dots slick-thumb">
                     <template #customPaging="props">
                         <a>
-                            <img :src="getImgUrl(props.index)" />
+                            <img :src="images[props.i].src" />
                         </a>
                     </template>
-                    <div v-for="(item, index) in images" :key="index">
+                    <div v-for="item in images" :key="item.id">
                         <img :src="item.src" />
                     </div>
 
@@ -18,37 +18,34 @@
             <div class="col-6">
                 <div class="info title">
                     <h1> {{ name }} </h1>
+                    <span>Thương hiệu : {{ manufacture }} </span> | <span>Số lượt xem : {{ views }}</span>
                 </div>
 
                 <div class="row">
                     <div class="col-6">
-                        <div class="info rate">
-                            <div class="row">
-                                <div class="col-4">
-                                    *****
-                                </div>
-                                <div class="col-4">
-                                    999 Đánh giá
-                                </div>
-                                <div class="col-4">
-                                    Số lượt thích 999
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="info price">
                             <h3 style="color: brown;"> Giá sản phẩm : <span>{{ formatCurrency(price) }}</span> </h3>
                         </div>
                         <div class="info color">
-                            Xanh đỏ tím vàng
+                            <span> Chọn màu: </span>
+                            <a-radio-group v-model:value="color" v-for="colorOption in colors">
+                                <a-radio-button :value=colorOption.value style="margin-left: 10px;">{{ colorOption.label
+                                }}</a-radio-button>
+                            </a-radio-group>
                         </div>
-                        <div class="info size">
-                            36 36 36 37
+                        <div class="info size" style="width: 700px;">
+                            <span class="me-2">Kích thước: </span>
+                            <a-radio-group v-model:value="size" v-for="sizeOption in sizes">
+                                <a-radio-button :value=sizeOption.value style="margin-left: 10px;">{{ sizeOption.label
+                                }}</a-radio-button>
+                            </a-radio-group>
                         </div>
                         <div class="info intrus">
                             Hướng dẫn size
                         </div>
                         <div class="info map" style="margin-bottom: 10px;">
-                            <a-button style="width: 100%;">TÌm sản phẩm tại </a-button>
+                            <a-button style="width: 100%;">Tìm sản phẩm tại </a-button>
                         </div>
                         <div class="row">
                             <div class="col-4" style="margin-bottom: 10px;">
@@ -56,7 +53,8 @@
                             </div>
                             <div class="col-8">
                                 <!-- <router-link :to= "{ name: 'cart' }"> -->
-                                <a-button style="width: 100%;" @click="addProductToCart(dataProduct)">Thêm vào giỏ
+                                <a-button style="width: 100%;" @click="addProductToCart(dataProduct, color, size)">Thêm vào
+                                    giỏ
                                     hàng</a-button>
                                 <!-- </router-link> -->
 
@@ -128,14 +126,48 @@
     <section>
         <a-card style="width: 100%" :tab-list="tabListNoTitle" :active-tab-key="noTitleKey"
             @tabChange="key => onTabChange(key, 'noTitleKey')">
+
             <p v-if="noTitleKey === 'Productdetails'">
-                {{ intro }}
+                {{ intro }}<br>
+                {{ body }}
             </p>
             <p v-else-if="noTitleKey === 'Comment'">
+            <div class="div" v-if="useUser.isAuthenticated">
+                comment đê
+            </div>
+
+            <div class="div" v-if="!useUser.isAuthenticated">
                 Vui lòng đăng nhập để bình luận
+            </div>
             </p>
             <p v-else>
-                Đăng nhập để đánh giá
+
+            <div class="div" v-if="useUser.isAuthenticated">
+                <span v-if="rating">
+                    Đánh giá của bạn : <br>
+                    <a-rate v-model:value="rating" @change="handleRating(rating)" />
+                    <br>
+                    <br>
+                    <div class="div">
+                        Nhận mã ưu đãi khi đã đánh giá : <br>
+                        <a-button @click="handleReceiveVoucher">
+                            GIAM10K
+                        </a-button>
+                    </div>
+
+                </span>
+                <span v-else>
+                    Đánh giá sản phẩm để nhận ưu đãi :
+                    <br>
+                    <a-rate v-model:value="rate" @change="handleRate(rate)" />
+                </span>
+            </div>
+
+            <div class="div" v-if="!useUser.isAuthenticated">
+                Vui lòng đăng nhập để bình luận
+            </div>
+
+
             </p>
             <template #tabBarExtraContent>
                 <a href="#">More</a>
@@ -232,24 +264,6 @@
 
     </section>
 
-    <!-- showcart -->
-
-    <!-- <template>
-        <a-button type="primary" style="margin-right: 8px" @click="showDrawer('default')">
-            Open Default Size (378px)
-        </a-button>
-
-        <a-drawer title="Basic Drawer" :size="size" :visible="visible" @close="onClose">
-            <template #extra>
-                <a-button style="margin-right: 8px" @click="onClose">Cancel</a-button>
-                <a-button type="primary" @click="onClose">Submit</a-button>
-            </template>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-        </a-drawer>
-    </template> -->
-
     <br>
     <br>
     <hr>
@@ -260,9 +274,11 @@
 import { HomeOutlined } from '@ant-design/icons-vue';
 import axios from 'axios';
 import { defineComponent, ref, reactive, toRefs } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+
 import { useCartStore } from '../../../store/use-cart.js'
 import { notification } from 'ant-design-vue';
+import { useUserStore } from '../../../store/use-user';
 
 const baseUrl = 'https://raw.githubusercontent.com/vueComponent/ant-design-vue/main/components/carousel/demo/';
 
@@ -271,6 +287,10 @@ export default defineComponent({
         HomeOutlined,
     },
     setup() {
+        const useUser = useUserStore();
+
+        const rate = ref();
+
         const getImgUrl = i => {
             if (images[i]) {
                 return images[i].src;
@@ -287,12 +307,12 @@ export default defineComponent({
             tab: 'Chi tiết sản phẩm',
         }, {
             key: 'Comment',
-            tab: 'BÌnh luận',
+            tab: 'Bình luận',
         }, {
             key: 'rate',
             tab: 'Đánh giá',
         }];
-        const key = ref('tab1');
+        const key = ref('Productdetails');
         const noTitleKey = ref('app');
         const onTabChange = (value, type) => {
             console.log(value, type);
@@ -308,37 +328,89 @@ export default defineComponent({
             name: '',
             price: '',
             intro: '',
+            manufacture: '',
+            views: '',
+            size: '',
+            body: '',
+            color: '',
+            rating: ''
+
         });
+
+        const sizes = ref([]);
+        const colors = ref([]);
+        const idRate = ref('');
 
         const images = ref([]);
         const dataProduct = ref([]);
+        const coupons = ref([]);
         const getProduct = () => {
             axios.get(`api/home/products/${route.params.id}`).then((res) => {
                 // console.log(res);
-
-
                 product.name = res.data.product.name;
                 product.price = res.data.product.price;
                 product.intro = res.data.product.intro;
+                product.body = res.data.product.body;
+                product.manufacture = res.data.product.manufacture.name;
+                product.views = res.data.product.views;
 
                 dataProduct.value = res.data.product;
-                for (const st of res.data.product.images) {
+                // sizes.value = res.data.sizes
 
-                    images.value.push({
-                        src: 'http://127.0.0.1:8000' + st.path,
+                for (const st of res.data.product.rate) {
+                    product.rating = st.rating
+                    idRate.value = st.id
+                }
+
+                for (const st of res.data.product.sizes) {
+                    sizes.value.push({
+                        label: st.name,
+                        value: st.id
                     })
                 }
+
+                for (const st of res.data.product.colors) {
+                    colors.value.push({
+                        label: st.name,
+                        value: st.id
+                    })
+                }
+
+                for (const st of res.data.product.images) {
+                    images.value.push({
+                        src: 'http://127.0.0.1:8000' + st.path,
+                        id: st.id
+                    })
+                }
+
+                for (const st of res.data.coupon) {
+                    const idCoupon = res.data.coupon.find(obj => obj.id === 1 && obj.coupon_code === 'H3YHS0');
+                    if (idCoupon) {
+                        coupons.value.push({
+                            id: st.id,
+                            name: st.coupon_code
+                        })
+                    }
+
+                }
+
+
 
             }).catch((Error) => {
                 console.log(Error);
             })
+
         }
-     
+
+
+
+
+
         // giỏ hàng
         const cart = useCartStore();
-        const addProductToCart = (dataProduct) => {
-            if (dataProduct) {
-                cart.addToCart(dataProduct);
+        const addProductToCart = (dataProduct, selectedColor, selectedSize) => {
+            if (dataProduct && selectedColor && selectedSize) {
+                cart.addToCart(dataProduct, selectedColor, selectedSize);
                 notification.open({
                     message: 'Thông báo',
                     description: 'Bạn đã thêm sản phẩm vào giỏ hàng thành công',
@@ -346,10 +418,10 @@ export default defineComponent({
                         console.log('Notification Clicked!');
                     },
                 });
-            }else {
+            } else {
                 notification.open({
                     message: 'Thông báo',
-                    description: 'Thêm sản phẩm thất bại',
+                    description: 'Thêm sản phẩm thất bại vui lòng chọn size hoặc màu',
                     onClick: () => {
                         console.log('Notification Clicked!');
                     },
@@ -358,11 +430,77 @@ export default defineComponent({
 
         }
 
+        //rate
+
+        const router = useRouter();
+        //thêm đánh giá 
+        const handleRate = (rate) => {
+            axios.post(`api/home/rate/${route.params.id}`, { rate: rate }).then((res) => {
+                if (res.data.code === 3) {
+
+                    notification.open({
+                        message: 'Thông báo',
+                        description: res.data.message,
+                        onClick: () => {
+                            console.log('Notification Clicked!');
+                        },
+                    });
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+
+
+                }
+            })
+        }
+
+        //xử lý cập nhật đánh giá
+        const handleRating = (rating) => {
+            axios.put(`api/home/rate/update/${idRate.value}`, { rate: rating }).then((res) => {
+                // console.log(res);
+                if (res.data.code == 3) {
+                    notification.open({
+                        message: 'Thông báo',
+                        description: res.data.message,
+                        onClick: () => {
+                            console.log('Notification Clicked!');
+                        },
+                    });
+
+                }
+            })
+        }
+        const handleReceiveVoucher = () => {
+            axios.post('api/user/coupon/create', { Coupon: coupons.value }).then((res) => {
+
+                if (res.data.code === 4) {
+                    notification.open({
+                        message: 'Thất bại',
+                        description: res.data.message,
+                        class: 'notification-custom-class',
+                    });
+                }
+
+                if (res.data.code === 3) {
+                    notification.open({
+                        message: 'Thành công',
+                        description: res.data.message,
+                        class: 'notification-custom-class',
+                    });
+                }
+            })
+        }
+
 
         getProduct();
 
         return {
-          
+            coupons,
+            handleReceiveVoucher,
+            idRate,
+            handleRating,
+            handleRate,
             getImgUrl,
             tabListNoTitle,
             key,
@@ -375,16 +513,22 @@ export default defineComponent({
             formatCurrency,
             addProductToCart,
             cart,
-            dataProduct
-
-
-
+            dataProduct,
+            rate,
+            useUser,
+            sizes,
+            colors
 
         };
     },
 });
 </script>
 <style scoped>
+
+.notification-custom-class {
+  color: red;
+  background-color: red;
+}
 .chinhsach {
     text-align: center;
     margin-bottom: 8px;

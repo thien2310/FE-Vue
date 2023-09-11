@@ -85,7 +85,7 @@
                         </div>
                     </div>
                     <div class="col-12 mt-3">
-                        <p>Nếu bạn chưa có tài khoản! Vui lòng <span><a href="">Đăng kí</a></span> </p>
+                        <p>Nếu bạn chưa có tài khoản! Vui lòng <span> <router-link :to="{ name: 'resgister'}"> Đăng kí</router-link></span> </p>
                     </div>
                 </a-card>
             </div>
@@ -120,19 +120,19 @@ export default defineComponent({
         const router = useRouter();
         const login = () => {
             storeUser.login(users)
-            if(storeUser.isAuthenticated){
+            if (storeUser.isAuthenticated) {
                 router.push('/home');
             }
         }
 
-       
+
 
         return {
             storeUser,
             ...toRefs(users),
             login,
             router,
-           
+
         }
 
     }

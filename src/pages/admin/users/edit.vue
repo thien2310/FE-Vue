@@ -243,7 +243,6 @@
                         </router-link>
                     </a-button>
                 </div>
-
             </div>
         </a-card>
     </form>
@@ -363,7 +362,7 @@ export default defineComponent({
         // lấy dữ liệu
 
         const filterOption = (input, option) => {
-            return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+            return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0; 
         };
 
         //tạo mới tài khoản

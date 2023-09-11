@@ -14,87 +14,27 @@
 
             <div class="col-sm-6 col-12">
                 <div class="row">
-                    <div class="col-sm-6 col-6">
-                        <a-card hoverable style="width: 360px">
-                            <template #cover>
-                                <img alt="example"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                            </template>
-                            <template #actions>
-                                <setting-outlined key="setting" />
-                                <edit-outlined key="edit" />
-                                <ellipsis-outlined key="ellipsis" />
-                            </template>
 
-                            <div class="title d-flex justify-content-center">
-                                tên sản phẩm
-                            </div>
-                            <div class="conten d-flex justify-content-center">
-                                thông tin cái
-                            </div>
-                        </a-card>
-                    </div>
-                    <div class="col-sm-6 col-6">
-                        <a-card hoverable style="width: 360px">
-                            <template #cover>
-                                <img alt="example"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                            </template>
-                            <template #actions>
-                                <setting-outlined key="setting" />
-                                <edit-outlined key="edit" />
-                                <ellipsis-outlined key="ellipsis" />
-                            </template>
+                    <div class="col-sm-6 col-6 mb-3" v-for="item in viewProduct" :key="item.id">
+                        <router-link :to="{ name: 'products', params: { id: item.id, slug: item.slug } }"
+                            class="custom-link-class">
+                            <a-card hoverable style="width: 360px">
+                                <template #cover>
+                                    <img alt="example"
+                                        :src="item.image ? 'http://127.0.0.1:8000' + item.image.path : 'https://fastcare.vn/core/img/default_image.png'" />
+                                </template>
 
-                            <div class="title d-flex justify-content-center">
-                                tên sản phẩm
-                            </div>
-                            <div class="conten d-flex justify-content-center">
-                                thông tin cái
-                            </div>
-                        </a-card>
-                    </div>
-                </div>
-                <div class="row" style="margin-top: 50px;">
-                    <div class="col-sm-6 col-6">
-                        <a-card hoverable style="width: 360px">
-                            <template #cover>
-                                <img alt="example"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                            </template>
-                            <template #actions>
-                                <setting-outlined key="setting" />
-                                <edit-outlined key="edit" />
-                                <ellipsis-outlined key="ellipsis" />
-                            </template>
-
-                            <div class="title d-flex justify-content-center">
-                                tên sản phẩm
-                            </div>
-                            <div class="conten d-flex justify-content-center">
-                                thông tin cái
-                            </div>
-                        </a-card>
-                    </div>
-                    <div class="col-sm-6 col-6">
-                        <a-card hoverable style="width: 360px">
-                            <template #cover>
-                                <img alt="example"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                            </template>
-                            <template #actions>
-                                <setting-outlined key="setting" />
-                                <edit-outlined key="edit" />
-                                <ellipsis-outlined key="ellipsis" />
-                            </template>
-
-                            <div class="title d-flex justify-content-center">
-                                tên sản phẩm
-                            </div>
-                            <div class="conten d-flex justify-content-center">
-                                thông tin cái
-                            </div>
-                        </a-card>
+                                <div class="title d-flex justify-content-center " style="height:52px;">
+                                    <h4> {{ item.name.toLocaleString() }} </h4>
+                                </div>
+                                <div class="conten d-flex justify-content-center">
+                                    <h4>Giá : {{ formatCurrency(item.price) }}</h4>
+                                </div>
+                                <div class="conten d-flex justify-content-center">
+                                    <h4>Số lượt xem : <span> {{ item.views }} </span> </h4>
+                                </div>
+                            </a-card>
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -111,17 +51,24 @@
         <template style="display: inline-block;">
             <div class="row">
                 <div class="col-6 col-sm-3" v-for="item in giaynu" :key="item.id">
-                    <router-link :to="{ name: 'products', params: { id: item.id, slug: item.slug } }">
+                    <router-link :to="{ name: 'products', params: { id: item.id, slug: item.slug } }"
+                        class="custom-link-class">
                         <a-card hoverable style="width: 365px">
                             <template #cover>
-                                <img alt="example" :src="'http://127.0.0.1:8000' + item.image.path" />
+                                <img alt="example"
+                                    :src="item.image ? 'http://127.0.0.1:8000' + item.image.path : 'https://fastcare.vn/core/img/default_image.png'" />
                             </template>
 
                             <div class="title d-flex justify-content-center " style="height:52px;">
-                                <p> {{ item.name.toLocaleString() }} </p>
+                                <h4>
+                                    <p> {{ item.name.toLocaleString() }} </p>
+                                </h4>
                             </div>
                             <div class="conten d-flex justify-content-center">
-                                Giá : {{ formatCurrency(item.price) }}
+                                <h4> Giá : {{ formatCurrency(item.price) }} </h4>
+                            </div>
+                            <div class="conten d-flex justify-content-center">
+                                <h4>Số lượt xem : <span> {{ item.views === null ? 0 : item.views }} </span> </h4>
                             </div>
                         </a-card>
                     </router-link>
@@ -138,84 +85,34 @@
         <div class="title d-flex justify-content-center m-4">
             <h1> GIÀY NAM </h1>
         </div>
-        <div class="row">
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
+        <template style="display: inline-block;">
+            <div class="row">
+                <div class="col-6 col-sm-3" v-for="item in giaynam" :key="item.id">
+                    <router-link class="custom-link-class"
+                        :to="{ name: 'products', params: { id: item.id, slug: item.slug } }">
+                        <a-card hoverable style="width: 365px">
+                            <template #cover>
+                                <img alt="example"
+                                    :src="item.image ? 'http://127.0.0.1:8000' + item.image.path : 'https://fastcare.vn/core/img/default_image.png'" />
+                            </template>
 
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
-            </div>
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
+                            <div class="title d-flex justify-content-center " style="height:52px;">
+                                <h4>
+                                    <p> {{ item.name.toLocaleString() }} </p>
+                                </h4>
+                            </div>
+                            <div class="conten d-flex justify-content-center">
+                                <h4> Giá : {{ formatCurrency(item.price) }} </h4>
+                            </div>
 
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
+                            <div class="conten d-flex justify-content-center">
+                                <h4>Số lượt xem : <span> {{ item.views === null ? 0 : item.views }} </span> </h4>
+                            </div>
+                        </a-card>
+                    </router-link>
+                </div>
             </div>
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
-
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
-            </div>
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
-
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
-            </div>
-        </div>
+        </template>
         <div class="title d-flex justify-content-center m-4">
             <a href="#"> Xem tất cả </a>
         </div>
@@ -225,86 +122,72 @@
 
     <section>
         <div class="title d-flex justify-content-center m-4">
-            <h1> GIÀY NAM </h1>
+            <h1> PHỤ KIỆN </h1>
         </div>
-        <div class="row">
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
+        <template style="display: inline-block;">
+            <div class="row">
+                <div class="col-6 col-sm-3" v-for="item in phukien" :key="item.id">
+                    <router-link class="custom-link-class"
+                        :to="{ name: 'products', params: { id: item.id, slug: item.slug } }">
+                        <a-card hoverable style="width: 365px" class="custom-link-class">
+                            <template #cover>
+                                <img alt="example"
+                                    :src="item.image ? 'http://127.0.0.1:8000' + item.image.path : 'https://fastcare.vn/core/img/default_image.png'" />
+                            </template>
 
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
-            </div>
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
+                            <div class="title d-flex justify-content-center " style="height:52px;">
+                                <h4>
+                                    <p> {{ item.name.toLocaleString() }} </p>
+                                </h4>
+                            </div>
+                            <div class="conten d-flex justify-content-center">
+                                <h4> Giá : {{ formatCurrency(item.price) }} </h4>
+                            </div>
 
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
+                            <div class="conten d-flex justify-content-center">
+                                <h4>Số lượt xem : <span> {{ item.views === null ? 0 : item.views }} </span> </h4>
+                            </div>
+                        </a-card>
+                    </router-link>
+                </div>
             </div>
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
-
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
-            </div>
-            <div class="col-6 col-sm-3">
-                <a-card hoverable style="width: 365px">
-                    <template #cover>
-                        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-                    </template>
-                    <template #actions>
-                        <setting-outlined key="setting" />
-                        <edit-outlined key="edit" />
-                        <ellipsis-outlined key="ellipsis" />
-                    </template>
-
-                    <div class="title d-flex justify-content-center">
-                        tên sản phẩm
-                    </div>
-                    <div class="conten d-flex justify-content-center">
-                        thông tin cái
-                    </div>
-                </a-card>
-            </div>
+        </template>
+        <div class="title d-flex justify-content-center m-4">
+            <a href="#"> Xem tất cả </a>
         </div>
+    </section>
+    <hr>
+
+    <section>
+        <div class="title d-flex justify-content-center m-4">
+            <h1> BALO-TÚI </h1>
+        </div>
+        <template style="display: inline-block;">
+            <div class="row">
+                <div class="col-6 col-sm-3" v-for="item in balotui" :key="item.id">
+                    <router-link class="custom-link-class"
+                        :to="{ name: 'products', params: { id: item.id, slug: item.slug } }">
+                        <a-card hoverable style="width: 365px" class="custom-link-class">
+                            <template #cover>
+                                <img alt="example"
+                                    :src="item.image ? 'http://127.0.0.1:8000' + item.image.path : 'https://fastcare.vn/core/img/default_image.png'" />
+                            </template>
+
+                            <div class="title d-flex justify-content-center " style="height:52px;">
+                                <p> {{ item.name.toLocaleString() }} </p>
+                            </div>
+                            <div class="conten d-flex justify-content-center">
+                                <h4> Giá : {{ formatCurrency(item.price) }} </h4>
+                            </div>
+
+                            <div class="conten d-flex justify-content-center">
+                                <h4>Số lượt xem : <span> {{ item.views === null ? 0 : item.views }} </span> </h4>
+                            </div>
+                        </a-card>
+                    </router-link>
+                </div>
+            </div>
+        </template>
         <div class="title d-flex justify-content-center m-4">
             <a href="#"> Xem tất cả </a>
         </div>
@@ -313,47 +196,69 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import Banner from '../components/Shop/Banner.vue';
 import { useMenu } from '../store/use-menu';
 import axios from 'axios';
-
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
     components: {
         Banner
     }
-
     ,
     setup() {
         useMenu().onSlectedKeys(['home'])
-        
-
-        const giaynu = ref([])
+        const giaynu = ref([]);
+        const giaynam = ref([]);
+        const phukien = ref([]);
+        const balotui = ref([]);
+        const viewProduct = ref([]);
         const formatCurrency = (price) => {
             return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
         }
-        const getGiayNu = () => {
-            axios.get('/api/home').then((res) => {
 
+        const getData = () => {
+            axios.get('/api/home').then((res) => {
+                console.log(res);
                 giaynu.value = res.data.giaynu;
+                giaynam.value = res.data.giaynam;
+                phukien.value = res.data.phukien;
+                balotui.value = res.data.balotui;
+                viewProduct.value = res.data.viewProduct;
 
             }).catch((Error) => {
-
                 console.log(Error);
             })
-
         }
-   
 
-        getGiayNu();
+        getData();
+
+        const route = useRoute();
+
+        watch(
+            () => route.params,
+            (params) => {
+                // const productId = params.id;
+                axios.post(`api/home/product/viewProduct/${params.id}`).then((res) => {
+
+                }).catch((Error) => {
+                    console.log(Error);
+                })
+            }
+        );
+
         return {
             giaynu,
+            giaynam,
+            phukien,
+            balotui,
             formatCurrency,
-        
+            viewProduct
         };
 
-    }
+    },
+
 })
 </script>
 
@@ -375,5 +280,11 @@ export default defineComponent({
     background-color: black;
     color: #fff;
     margin-top: 10px;
+}
+
+.custom-link-class {
+    /* Your hover styles here */
+    text-decoration: none;
+    /* For underline effect */
 }
 </style>

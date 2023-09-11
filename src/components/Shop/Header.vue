@@ -38,7 +38,7 @@
                     <i class="fa-solid fa-cart-shopping fa-xl "></i>
                 </a-badge>
             </span>
- 
+
 
         </div>
 
@@ -69,14 +69,14 @@
             <div class="col-sm-4">
                 <a-avatar shape="square" :size="75">
                     <template #icon>
-                        <img :src="'http://127.0.0.1:8000' + product.images.path" alt="">
+                        <img :src="'http://127.0.0.1:8000' + product.image.path" alt="">
                     </template>
                 </a-avatar>
             </div>
             <div class="col-sm-8">
                 <p><span>{{ product.name }}</span></p>
-                <p><span>màu sắc</span></p>
-                <p><span>Kích cỡ</span></p>
+                <p><span>Màu sắc: {{ getNameById(product.colors,product.color) }}</span></p>
+                <p><span>Kích cỡ: {{ getNameById(product.sizes,product.size) }}</span></p>
                 <p><span>{{ product.quantity }}</span> x <span class="me-5"> {{ formatCurrency(product.price) }}</span>
                     <span class="d-flex justify-content-end" style="cursor: pointer ;" @click="removeFromCart(product.id)">
                         <i class="fa-solid fa-xmark fa-xl "></i> </span>
@@ -167,6 +167,12 @@ export default defineComponent({
             }, 0);
         });
 
+        const getNameById = (Colors, Color) => {
+
+            const foundColor = Colors.find(m => m.id === Color);
+            return foundColor ? foundColor.name : null;
+        }
+
 
         const removeFromCart = (productId) => {
             cart.removeFromCart(productId);
@@ -177,6 +183,8 @@ export default defineComponent({
         }
 
         return {
+
+            getNameById,
             open,
             showDrawer,
             visible,

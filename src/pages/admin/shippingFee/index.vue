@@ -1,20 +1,15 @@
 <template>
-    <a-card title="Danh mục sản phẩm" style="width: 100%">
-
-        <div class="row mb-3">
+    <a-card title="Quản lý phí vận chuyển">
+        <div class="row mb-3" style="width: 100%;">
             <div class="col-12 d-flex justify-content-space-between">
                 <a-input-search v-model:value="search" placeholder="Tìm ..." style="width: 200px ; order: -1;" />
 
                 <a-button type="primary" class="action" style="background-color: rgb(34, 168, 72); margin-left: auto;">
-
                     <i class="fa-solid fa-rotate"></i>
-
                 </a-button>
 
                 <a-button type="primary" class="action" style="background-color: rgb(47, 145, 75); margin-left: 10px;">
-
                     <i class="fa-solid fa-file-export"></i>
-
                 </a-button>
 
                 <a-button type="primary" class="action" style="background-color: hsl(156, 55%, 36%); margin-left: 10px;">
@@ -38,7 +33,7 @@
 
 
                 <a-button type="primary" class="" style="margin-left: 10px;">
-                    <router-link :to="{ name: 'admin-category-create' }">
+                    <router-link :to="{ name: 'admin-ships-create' }">
                         <i class="fa-solid fa-plus"></i>
                     </router-link>
                 </a-button>
@@ -47,7 +42,7 @@
 
         <div class="row">
             <div class="col-12">
-                <a-table :dataSource="category" :columns="columns" :pagination="{ pageSize: 5 }" :scroll="{ x: 576 }">
+                <a-table :dataSource="feeShips" :columns="columns" :pagination="{ pageSize: 5 }" :scroll="{ x: 576 }">
 
                     <template #bodyCell="{ column, index, record }">
 
@@ -55,11 +50,15 @@
                             <span>{{ index + 1 }}</span>
                         </template>
 
-                        <template v-if="column.key === 'status'">
-                            <!-- <span v-if="record.status_id = 1" class="text-primary">{{ record.status }}</span> -->
-                            <span v-if="record.status === 0"> <a-button type="primary" danger> Chưa kích hoạt
-                                </a-button></span>
-                            <span v-if="record.status === 1"><a-button type="primary"> kích hoạt </a-button></span>
+                        <template v-if="column.key === 'city'">
+                            <span> {{ record.nameCity }}  </span>
+                        </template>
+
+                        <template v-if="column.key === 'district'">
+                            <span> {{ record.nameDistrict }}  </span>
+                        </template>
+                        <template v-if="column.key === 'ward'">
+                            <span> {{ record.nameward }}  </span>
                         </template>
 
                         <template v-if="column.key === 'action'">
@@ -86,19 +85,16 @@
             </div>
         </div>
     </a-card>
-</template> 
+</template>
 
 <script>
+import { ref } from 'vue';
 import { useMenu } from '../../../store/use-menu.js';
-import { defineComponent, ref, watch } from 'vue';
-import { message } from 'ant-design-vue';
 import axios from 'axios';
 
-export default defineComponent({
+export default {
     setup() {
-        useMenu().onSlectedKeys(['admin-category']);
-
-        const category = ref('')
+        useMenu().onSlectedKeys(['admin-roles']);
 
         const columns = [
             {
@@ -107,15 +103,25 @@ export default defineComponent({
                 key: 'index',
             },
             {
-                title: 'Tên danh mục',
-                dataIndex: 'name',
-                key: 'name',
+                title: 'Tỉnh, Thành phố',
+                dataIndex: 'city',
+                key: 'city',
             },
 
             {
-                title: 'Trạng thái',
-                dataIndex: 'status',
-                key: 'status',
+                title: 'Quận, huyện',
+                dataIndex: 'district',
+                key: 'district',
+            },
+            {
+                title: 'Xã, phường',
+                dataIndex: 'ward',
+                key: 'ward',
+            },
+            {
+                title: 'Phí vận chuyển',
+                dataIndex: 'fee_ship',
+                key: 'fee_ship',
             },
 
             {
@@ -128,46 +134,26 @@ export default defineComponent({
         ];
 
 
-        const getCategory = () => {
-            axios.get('api/category')
-                .then((response) => {
-                    console.log(response);
-                    category.value = response.data.category
-
-                })
-                .catch((error) => {
-                    // xử trí khi bị lỗi
-                    console.log(error);
-                })
+        const feeShips = ref([])
+      
+        const getData = () => {
+            axios.get('api/ships').then((res) => {
+                console.log(feeShips);
+                feeShips.value = res.data.fee_shipping
+             
+            })
         }
-
-        const deletelCategory = (id) => {
-
-            axios.get(`api/category/deletel/${id}`)
-                .then((response) => {
-                    message.success('Xóa người dùng thành công');
-                    category.value = category.value.filter(item => item.id !== id);
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-        }
-
-
-        getCategory();
-
-
-
+        
+    
+        getData();
         return {
             columns,
-            category,
-            deletelCategory
-
-
-        };
+            feeShips,
+           
+        }
 
 
     },
-})
+}
 
 </script>

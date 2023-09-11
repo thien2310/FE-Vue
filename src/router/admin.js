@@ -11,6 +11,27 @@ const admin = [
                 name: "admin-users",
                 component: () => import("../pages/admin/users/index.vue")
             },
+
+            // quản lý đơn hàng
+
+            {
+                path: "orders",
+                name: "admin-orders",
+                component: () => import("../pages/admin/Order/index.vue")
+            },
+            {
+                path: "orders/preview/:id",
+                name: "admin-order-preview",
+                component: () => import("../pages/admin/Order/preview.vue")
+            },
+            {
+                path: "orders/comple",
+                name: "admin-order-comple",
+                component: () => import("../pages/admin/Order/comple.vue")
+            },
+
+
+
             //creat user
             {
                 path: "users/create",
@@ -37,7 +58,7 @@ const admin = [
                 component: () => import("../pages/admin/Category/create.vue")
             },
             {
-                path: "category/edit",
+                path: "category/edit/:id",
                 name: "admin-category-edit",
                 component: () => import("../pages/admin/Category/edit.vue")
             },
@@ -54,18 +75,53 @@ const admin = [
                 component: () => import("../pages/admin/product/index.vue")
             },
 
-            // quản lý vai trò
             {
-                path: "roles",
-                name: "admin-roles",
-                component: () => import("../pages/admin/roles/index.vue")
+                path: "product/edit/:id",
+                name: "admin-product-edit",
+                component: () => import("../pages/admin/product/edit.vue")
             },
+
+
+
+            // quản lý phí vận chuyển
+            {
+                path: "ships",
+                name: "admin-ships",
+                component: () => import("../pages/admin/shippingFee/index.vue")
+            },
+
+            {
+                path: "ships/create",
+                name: "admin-ships-create",
+                component: () => import("../pages/admin/shippingFee/create.vue")
+            },
+
+    
+            // quản lí mã giảm giá
+            {
+                path: "coupons",
+                name: "admin-coupons",
+                component: () => import("../pages/admin/Coupon/index.vue")
+            },
+            {
+                path: "coupons/create",
+                name: "admin-coupons-create",
+                component: () => import("../pages/admin/Coupon/create.vue")
+            },
+
 
             {
                 path: "settings",
                 name: "admin-settings",
                 component: () => import("../pages/admin/settings/index.vue")
-            }
+            },
+
+            //THống kê số liệu
+            {
+                path: "staticical",
+                name: "admin-staticical",
+                component: () => import("../pages/admin/Staticical/index.vue")
+            },
 
 
         ],
@@ -79,7 +135,7 @@ const admin = [
         path: "/auth/login",
         component: () => import("../layouts/auth/login.vue"),
         name: "auth-login",
-       
+
     }
 
 ];

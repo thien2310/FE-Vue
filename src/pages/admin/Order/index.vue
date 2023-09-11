@@ -1,20 +1,15 @@
 <template>
-    <a-card title="Danh mục sản phẩm" style="width: 100%">
-
-        <div class="row mb-3">
+    <a-card title="Quản lý đơn hàng">
+        <div class="row mb-3" style="width: 100%;">
             <div class="col-12 d-flex justify-content-space-between">
                 <a-input-search v-model:value="search" placeholder="Tìm ..." style="width: 200px ; order: -1;" />
 
                 <a-button type="primary" class="action" style="background-color: rgb(34, 168, 72); margin-left: auto;">
-
                     <i class="fa-solid fa-rotate"></i>
-
                 </a-button>
 
                 <a-button type="primary" class="action" style="background-color: rgb(47, 145, 75); margin-left: 10px;">
-
                     <i class="fa-solid fa-file-export"></i>
-
                 </a-button>
 
                 <a-button type="primary" class="action" style="background-color: hsl(156, 55%, 36%); margin-left: 10px;">
@@ -38,7 +33,7 @@
 
 
                 <a-button type="primary" class="" style="margin-left: 10px;">
-                    <router-link :to="{ name: 'admin-category-create' }">
+                    <router-link :to="{ name: 'admin-coupons-create' }">
                         <i class="fa-solid fa-plus"></i>
                     </router-link>
                 </a-button>
@@ -47,37 +42,36 @@
 
         <div class="row">
             <div class="col-12">
-                <a-table :dataSource="category" :columns="columns" :pagination="{ pageSize: 5 }" :scroll="{ x: 576 }">
+                <a-table :dataSource="orders" :columns="columns" :pagination="{ pageSize: 5 }" :scroll="{ x: 576 }">
 
                     <template #bodyCell="{ column, index, record }">
 
                         <template v-if="column.key === 'index'">
                             <span>{{ index + 1 }}</span>
                         </template>
-
-                        <template v-if="column.key === 'status'">
-                            <!-- <span v-if="record.status_id = 1" class="text-primary">{{ record.status }}</span> -->
-                            <span v-if="record.status === 0"> <a-button type="primary" danger> Chưa kích hoạt
+                        <template v-if="column.key === 'status_order'">
+                            <span v-if="record.status_order === 1"> <a-button type="primary"> Đơn hàng mới
                                 </a-button></span>
-                            <span v-if="record.status === 1"><a-button type="primary"> kích hoạt </a-button></span>
+                            <span v-if="record.status_order === 2"><a-button type="primary"> Đã xử lý </a-button></span>
                         </template>
-
                         <template v-if="column.key === 'action'">
                             <a-button class="" style="margin: 10px !important">
-                                <router-link :to="{ name: 'admin-category-edit', params: { id: record.id } }">
-                                    <i class="fa-solid fa-pen-to-square"></i>
+                                <router-link :to="{ name: 'admin-order-preview', params: { id: record.id } }">
+                                    <i class="fa-solid fa-eye"></i>
                                 </router-link>
                             </a-button>
                         </template>
 
-
                         <template v-if="column.key === 'action'">
                             <a-button>
-                                <a-popconfirm title="Bạn có thực sự muốn xóa" @confirm="deletelCategory(record.id)">
-                                    <i class="fa-solid fa-trash"></i>
+                                <a-popconfirm title="Hoàn tất đơn hàng"
+                                    @confirm="OrderComple(record.id, record.status_order)">
+                                    <i class="fa-solid fa-check"></i>
                                 </a-popconfirm>
                             </a-button>
                         </template>
+
+
                     </template>
 
                 </a-table>
@@ -86,37 +80,37 @@
             </div>
         </div>
     </a-card>
-</template> 
+</template>
 
 <script>
+import { ref } from 'vue';
 import { useMenu } from '../../../store/use-menu.js';
-import { defineComponent, ref, watch } from 'vue';
-import { message } from 'ant-design-vue';
 import axios from 'axios';
+import { notification } from 'ant-design-vue';
 
-export default defineComponent({
+export default {
     setup() {
-        useMenu().onSlectedKeys(['admin-category']);
-
-        const category = ref('')
+        useMenu().onSlectedKeys(['admin-orders']);
 
         const columns = [
             {
                 title: '#',
                 dataIndex: '',
                 key: 'index',
+                width: '10%'
             },
             {
-                title: 'Tên danh mục',
-                dataIndex: 'name',
-                key: 'name',
+                title: 'Mã đơn hàng',
+                dataIndex: 'code_zip',
+                key: 'code_zip',
             },
 
             {
-                title: 'Trạng thái',
-                dataIndex: 'status',
-                key: 'status',
+                title: 'Trạng thái đơn hàng',
+                dataIndex: 'status_order',
+                key: 'status_order',
             },
+
 
             {
                 title: 'Công cụ',
@@ -128,46 +122,49 @@ export default defineComponent({
         ];
 
 
-        const getCategory = () => {
-            axios.get('api/category')
-                .then((response) => {
-                    console.log(response);
-                    category.value = response.data.category
+        const orders = ref([])
+        const status = ref();
 
-                })
-                .catch((error) => {
-                    // xử trí khi bị lỗi
-                    console.log(error);
-                })
-        }
+        const getData = () => {
+            axios.get('api/order').then((res) => {
+                orders.value = res.data.orders
 
-        const deletelCategory = (id) => {
-
-            axios.get(`api/category/deletel/${id}`)
-                .then((response) => {
-                    message.success('Xóa người dùng thành công');
-                    category.value = category.value.filter(item => item.id !== id);
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
+            })
         }
 
 
-        getCategory();
+        const OrderComple = (id, status_order) => {
+            if (status_order === 2) {
+                axios.post(`api/order/compleOrder/${id}`).then((res) => {
+                    if (res.data.code == 4) {
+                        orders.value = orders.value.filter(m => m.id !== id)
+                        notification.open({
+                            message: 'Thành công',
+                            description: res.data.message,
+                        });
+                    }
+                })
+            } else {
+                notification.open({
+                    message: 'Thất bại',
+                    description: 'Bạn chưa phê duyệt đơn hàng vui lòng thử lại',
+                });
+            }
 
 
+        }
 
+        getData();
         return {
             columns,
-            category,
-            deletelCategory
+            orders,
+            status,
+            OrderComple
 
-
-        };
+        }
 
 
     },
-})
+}
 
 </script>

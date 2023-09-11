@@ -1,6 +1,6 @@
 <template>
-    <form @submit.prevent="createProduct()">
-        <a-card title="Thêm mới sản phẩm" style="width: 100%">
+    <form @submit.prevent="updateProduct()">
+        <a-card title="Cập nhật sản phẩm" style="width: 100%">
 
             <div class="row">
                 <div class="col-12 col-sm-6">
@@ -34,7 +34,7 @@
                             </label>
                         </div>
                         <div class="col-12 col-sm-9">
-                            <a-input placeholder="Nhập tên sản phẩm" v-model:value="name" style="width: 100%" :class="{
+                            <a-input placeholder="" v-model:value="name" style="width: 100%" :class="{
                                 'input-danger': errors.name
                             }" />
                             <div class="w-100"></div>
@@ -59,7 +59,7 @@
                             <small v-if="errors.status" class="text-danger"> {{ errors.status[0] }}</small>
                         </div>
                     </div>
-                    <!-- giá sản phẩm khi bán -->
+                    <!-- giá sản gốc -->
                     <div class="row mb-3">
                         <div class="col-12 col-sm-3 text-start text-sm-end">
                             <label for="">
@@ -68,28 +68,25 @@
                             </label>
                         </div>
                         <div class="col-12 col-sm-9">
-                            <a-input type="number"
-                                placeholder="Nhập giá sản phẩm .VD: giá bán ra ngoài thị trường có phí phát sinh"
-                                v-model:value="price" style="width: 100%" :class="{
-                                    'input-danger': errors.price
-                                }" />
+                            <a-input type="number" placeholder="" v-model:value="price" style="width: 100%" :class="{
+                                'input-danger': errors.price
+                            }" />
                             <div class="w-100"></div>
                             <small v-if="errors.price" class="text-danger"> {{ errors.price[0] }}</small>
                         </div>
                     </div>
-                    <!-- giá gốc -->
+                    <!-- giá sản phẩm sau khi giảm -->
                     <div class="row mb-3">
                         <div class="col-12 col-sm-3 text-start text-sm-end">
                             <label for="">
                                 <span class="text-danger me-1">*</span>
-                                <span> Giá gốc </span>
+                                <span> Giá sản phẩm sau khi giảm </span>
                             </label>
                         </div>
                         <div class="col-12 col-sm-9">
-                            <a-input type="number" placeholder="Nhập giá gốc . VD: nhập vào 20000đ thì là giá gốc"
-                                v-model:value="base_price" style="width: 100%" :class="{
-                                    'input-danger': errors.base_price
-                                }" />
+                            <a-input type="number" placeholder="" v-model:value="base_price" style="width: 100%" :class="{
+                                'input-danger': errors.base_price
+                            }" />
                             <div class="w-100"></div>
                             <small v-if="errors.base_price" class="text-danger"> {{ errors.base_price[0] }}</small>
                         </div>
@@ -105,7 +102,7 @@
                             </label>
                         </div>
                         <div class="col-12 col-sm-9">
-                            <a-textarea :rows="6" v-model:value="intro" placeholder="maxlength is 6" :maxlength="500000"
+                            <a-textarea :rows="4" v-model:value="intro" placeholder="maxlength is 6" :maxlength="500000"
                                 :class="{
                                     'input-danger': errors.intro
                                 }" />
@@ -125,7 +122,7 @@
                         <div class="col-12 col-sm-9">
                             <!-- <editor api-key="no-api-key" /> -->
 
-                            <a-textarea :rows="6" v-model:value="body" placeholder="maxlength is 6" :maxlength="5000000"
+                            <a-textarea :rows="4" v-model:value="body" placeholder="maxlength is 6" :maxlength="5000000"
                                 :class="{
                                     'input-danger': errors.body
                                 }" />
@@ -135,6 +132,8 @@
                         </div>
                     </div>
                 </div>
+
+
 
 
                 <div class="col-12 col-sm-6">
@@ -185,6 +184,7 @@
                             <small v-if="errors.size" class="text-danger"> {{ errors.size[0] }}</small>
                         </div>
                     </div>
+
 
                     <!-- nguồn gốc -->
                     <div class="row mb-3">
@@ -262,7 +262,7 @@
                                 </div>
                             </a-upload>
                             <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
-                                <img alt="example" style="width: 100%" :src="previewImage" />
+                                <img alt="example" style="width: 100%" :src="fileList" />
                             </a-modal>
 
                         </div>
@@ -282,8 +282,9 @@
                                     <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
                                     <div v-else>
                                         <loading-outlined v-if="loading"></loading-outlined>
+                                        <img v-if="avatarPath" :src="'http://127.0.0.1:8000' + avatarPath" alt="avatar" />
                                         <i v-else class="fa-solid fa-user-plus"></i>
-                                        <!-- <div class="ant-upload-text">Upload</div> -->
+
                                     </div>
                                 </template>
                             </a-avatar>
@@ -316,31 +317,10 @@
                 </div>
 
             </div>
+
         </a-card>
-
     </form>
-
-
-    <!-- model -->
-    <a-modal v-model:visible="visible" title="Thêm mới màu sắc">
-
-        <template #footer>
-            <a-button key="back" @click="handleModalCancel">Return</a-button>
-            <a-button html_type="submit" type="primary" :loading="loading" @click="handleOk">Submit</a-button>
-        </template>
-        <br>
-        <a-input placeholder="Nhập tên" v-model:value="colorName" @input="clearError" style="width: 100%" />
-        <small v-if="Error.name" class="text-danger"> {{ Error.name[0] }}</small>
-        <br>
-        <br>
-        <a-input placeholder="Nhập code" v-model:value="colorCode" style="width: 100%" />
-        <small v-if="Error.code" class="text-danger"> {{ Error.code[0] }}</small>
-
-    </a-modal>
 </template>
-
-
-
 
 <script>
 
@@ -349,8 +329,8 @@ import { PlusOutlined } from '@ant-design/icons-vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { notification } from 'ant-design-vue';
-
 
 import { LoadingOutlined } from '@ant-design/icons-vue';
 
@@ -378,7 +358,6 @@ export default defineComponent({
     },
 
     setup() {
-        //avatar
 
         const loading = ref(false);
         const imageUrl = ref('');
@@ -402,7 +381,7 @@ export default defineComponent({
             }
         };
         const beforeUpload = file => {
-            const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
+            const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
             if (!isJpgOrPng) {
                 message.error('Chọn đúng định dạng file');
             }
@@ -412,7 +391,7 @@ export default defineComponent({
             }
             return isJpgOrPng && isLt2M;
         };
-        //end avatar
+        // end avatar
         const options = ref([{
             value: '',
             label: '',
@@ -440,7 +419,7 @@ export default defineComponent({
         const previewTitle = ref('');
         const uploadedImages = ref([]);
         const fileList = ref([]);
-        const file = ref([]);
+
         const handleCancel = () => {
             previewVisible.value = false;
             previewTitle.value = '';
@@ -455,24 +434,53 @@ export default defineComponent({
             previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
 
         };
+
         //lấy dữ liệu
+        const route = useRoute();
+
+        const avatarPath = ref('');
+        const listImagePath = ref([]);
         const colors = ref([
         ]);
         const sizes = ref([]);
 
-        const getProducts = () => {
-            axios.get('api/product/create').then((res) => {
-                // console.log(res);
-                datastatus.value = res.data.status;
-                states.value = res.data.state;
+        const getProduct = () => {
+            axios.get(`api/product/edit/${route.params.id}`).then((res) => {
+                console.log(res);
+                product.parent_id = res.data.product.cate_id
+                product.name = res.data.product.name
+                product.status = res.data.product.status
+                product.price = res.data.product.price
+                product.base_price = res.data.product.base_price
+                product.intro = res.data.product.intro
+                product.body = res.data.product.body
+                product.origin = res.data.product.origin_id
+                product.manufacturer = res.data.product.manufacturer_id
+                product.state = res.data.product.state
 
-                for (const cate_id of res.data.category) {
-                    options.value.push(
-                        {
-                            value: cate_id.id,
-                            label: cate_id.name
-                        }
-                    )
+
+
+
+                for (const color of res.data.product.colors) {
+                    product.color.push(color.id)
+                }
+
+                for (const size of res.data.product.sizes) {
+                    product.size.push(size.id)
+                }
+
+
+                if (res.data.image !== null) {
+                    avatarPath.value = res.data.image.path
+                }
+                // avatarPath.value = res.data.image.path 
+
+                for (const va of res.data.images) {
+                    fileList.value.push({
+                        id: va.id,
+                        url: 'http://127.0.0.1:8000' + va.path,
+
+                    })
                 }
 
                 for (const color of res.data.colors) {
@@ -493,27 +501,28 @@ export default defineComponent({
                     )
                 }
 
-
-                for (const data_ori of res.data.manufacturer
-                ) {
-                    manufacturers.value.push(
-                        {
-                            value: data_ori.id,
-                            label: data_ori.name
-                        }
-                    )
+                for (const cate of res.data.category) {
+                    options.value.push({
+                        value: cate.id,
+                        label: cate.name
+                    })
                 }
 
-                for (const data_manu of res.data.origin) {
-                    origins.value.push(
-                        {
-                            value: data_manu.id,
-                            label: data_manu.name
-                        }
-                    )
+                for (const ma of res.data.manufacture) {
+                    manufacturers.value.push({
+                        value: ma.id,
+                        label: ma.name
+                    })
+                }
+                for (const ori of res.data.orgin) {
+                    origins.value.push({
+                        value: ori.id,
+                        label: ori.name
+                    })
                 }
 
-
+                datastatus.value = res.data.status
+                states.value = res.data.state
 
             }).catch((error) => {
                 console.log(error)
@@ -523,7 +532,7 @@ export default defineComponent({
         //tạo mới sản phẩm
 
 
-        const products = reactive({
+        const product = reactive({
             parent_id: '',
             name: '',
             status: '',
@@ -537,16 +546,19 @@ export default defineComponent({
             manufacturer: '',
             state: '',
             color: [],
-            size: []
+            size: [],
+
         });
 
         const errors = ref([]);
         const router = useRouter();
 
-        const createProduct = () => {
+        const updateProduct = () => {
 
-            axios.post('api/product/create/store', products).then((res) => {
-                // console.log(res);
+            axios.put(`api/product/update/${route.params.id}`, product).then((res) => {
+
+                console.log(res);
+
                 if (res.data.code === 1) {
                     notification.open({
                         message: 'Thành công',
@@ -554,7 +566,6 @@ export default defineComponent({
                     });
                     router.push({ name: "admin-product" })
                 }
-
 
             }).catch((error) => {
                 console.log(error);
@@ -567,72 +578,11 @@ export default defineComponent({
             return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
         };
 
-        getProducts();
-
-        //model
-
-        const visible = ref(false);
-        const showModal = () => {
-            visible.value = true;
-        };
-        const handleModalCancel = () => {
-            visible.value = false;
-            loading.value = false;
-        };
-        const Error = ref('');
-        //xóa thông báo khi nhập dữ liệu
-        const clearError = () => {
-            Error.value = '';
-            loading.value = false;
-        }
-
-
-
-        //mutil color
-        const colorName = ref('');
-        const colorCode = ref('');
-
-        const handleOk = () => {
-            try {
-
-                loading.value = true;
-                axios.post('api/color/create', { name: colorName.value, code: colorCode.value }).then((res) => {
-                    // console.log(res);
-                    if (res.data.code === 3) {
-                        notification.open({
-                            message: 'Thành công',
-                            description: 'Thêm mã màu mới thành công',
-                        });
-                    }
-
-                }).catch((error) => {
-                    console.log(error)
-                    Error.value = error.response.data.errors
-                    visible.value = true;
-                    loading.value = true;
-
-                })
-
-                colorName.value = '';
-                colorCode.value = '';
-                loading.value = false;
-                visible.value = false
-
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-
+        getProduct();
         return {
-            clearError,
-            Error,
-            colorCode,
-            colorName,
-            handleOk,
-            showModal,
-            visible,
-            ...toRefs(products),
+            sizes,
+            colors,
+            ...toRefs(product),
             value: ref(undefined),
             filterOption,
             previewVisible,
@@ -648,24 +598,20 @@ export default defineComponent({
             handleChange,
             beforeUpload,
             imageUrl,
-            createProduct,
+            updateProduct,
             origins,
             manufacturers,
             errors,
             states,
-            colors,
-            sizes,
-            handleModalCancel
+            avatarPath,
+            listImagePath,
+
+
 
 
         };
     }
 })
-
-
-
-
-
 </script>
 
 <style>

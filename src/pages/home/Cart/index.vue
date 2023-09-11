@@ -3,7 +3,7 @@
         <div class="div" style="margin-left: 86px;padding-top: 17px;">
             <a-breadcrumb>
                 <a-breadcrumb-item>Home</a-breadcrumb-item>
-                <a-breadcrumb-item><a href="">Cart</a></a-breadcrumb-item>
+                <a-breadcrumb-item><span style="color: blue;">Cart</span></a-breadcrumb-item>
             </a-breadcrumb>
         </div>
 
@@ -45,32 +45,69 @@
         </a-card>
         <br>
         <hr>
+        <div class="row">
+            <a-card>
+                <div class="d-flex justify-content-between">
+                    <h3>Voucher của bạn</h3>
+                    <a style="border-radius: none;" @click="showModal">Chọn Voucher</a>
+                </div>
 
-        <div class="row mt-4">
-            <div class="col-sm-6">
-            </div>
-            <div class="col-sm-6 mr-2" style="">
-                <p>Tổng tiền hàng: <span>{{ formatCurrency(total) }} </span></p>
-                <p>Giảm giá sản phẩm: <span>{{ formatCurrency(giamgia) }} </span></p>
-                <p>Giảm giá coupon: <span>{{ formatCurrency(voucher) }} </span></p>
-                <p>Phí vận chuyển: <span>{{ formatCurrency(ship) }} </span></p>
-                <hr>
-                <p>Tổng tiền hàng: <span>{{ formatCurrency(total + giamgia + voucher + ship) }} </span></p>
-
-            </div>
+                <a-modal style="max-height: 500px; overflow-y: auto;" v-model:visible="visible" title="Chọn mã giảm giá"
+                    @ok="handleOk">
+                    <a-list>
+                        <div class="row">
+                            <a-radio-group v-model:value="checkedVoucher" v-for="m of coupons">
+                                <div class="col-md-12 mt-2">
+                                    <a-card style="width: 100%">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <i class="fa-solid fa-ticket fa-xl " style="width: 10%;"></i>
+                                            <div style="width: 60%;">
+                                                <h3>{{ m.coupons.name }}</h3>
+                                                <p>Trị giá: {{ formatCurrency(m.coupons.price_coupon) }}</p>
+                                                <p>Mã voucher: {{ m.coupons.coupon_code }}</p>
+                                            </div>
+                                            <div style="width: 30%; margin-left: auto;">
+                                                <a-radio :value="m.id" class="position-absolute end-0"></a-radio>
+                                            </div>
+                                        </div>
+                                    </a-card>
+                                </div>
+                            </a-radio-group>
+                        </div>
+                    </a-list>
+                </a-modal>
+            </a-card>
         </div>
 
-       <InfoGuest />
+        <div class="row mt-4" style="display: flex; justify-content: end;">
+
+            <a-card title="Tổng thanh toán" style="width: 500px; margin-right: 100px; font-size: 17px; ">
+                <h5>Tổng tiền hàng: <span>{{ formatCurrency(total) }} </span></h5>
+                <h5>Giảm giá sản phẩm: <span> {{ formatCurrency(khuyenmai) }} </span></h5>
+                <h5>Giảm giá coupon: <span> {{ formatCurrency(voucher) }} </span></h5>
+                <!-- <h5>Phí vận chuyển: <span>{{ formatCurrency(ship) }} </span></h5> -->
+                <hr>
+                <h5>Tổng tiền hàng: <span>{{ formatCurrency(total - voucher - khuyenmai) }} </span></h5>
+
+                <router-link :to="{ name: 'checkout', params: { idVoucher: idVoucher } }">
+                    <a-button style="width: 100%;">
+                        Tiến hành thanh toán
+                    </a-button>
+                </router-link>
+            </a-card>
+
+        </div>
 
 
     </section>
 </template>
 <script>
 import { SmileOutlined, DownOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue';
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useCartStore } from '../../../store/use-cart';
 import { computed } from 'vue';
-import InfoGuest from './infoGuest.vue';
+import axios from 'axios';
+
 
 
 const columns = [{
@@ -103,12 +140,12 @@ const data = [{
 }];
 export default defineComponent({
     components: {
-    SmileOutlined,
-    DownOutlined,
-    ArrowUpOutlined,
-    ArrowDownOutlined,
-    InfoGuest
-},
+        SmileOutlined,
+        DownOutlined,
+        ArrowUpOutlined,
+        ArrowDownOutlined,
+
+    },
     setup() {
 
         const cart = useCartStore();
@@ -122,9 +159,7 @@ export default defineComponent({
             }, 0);
         });
 
-        const ship = 12000;
-        const giamgia = 0;
-        const voucher = 0;
+
 
         const updateQuantity = (productId) => {
             const product = cart.products.find(p => p.id === productId);
@@ -136,16 +171,50 @@ export default defineComponent({
         const removeFromCart = (productId) => {
             cart.removeFromCart(productId);
         };
+        //showvoucher
+        const visible = ref(false);
+        const showModal = () => {
+            visible.value = true;
+        };
+
+        const checkedVoucher = ref()
+        const coupons = ref([])
+        const getData = () => {
+            axios.get('api/user/coupon/index').then((res) => {
+                coupons.value = res.data.coupons
+            })
+        }
+
+        const voucher = ref(0);
+        const khuyenmai = ref(0);
+        const idVoucher = ref(0);
+        const handleOk = () => {
+            const voucherUse = coupons.value.find(m => m.id === checkedVoucher.value)
+            const priceVoucher = voucherUse.coupons.price_coupon
+            const id = voucherUse.id
+            voucher.value = priceVoucher;
+            idVoucher.value = id;
+            visible.value = false;
+        };
+
+
+
+        getData()
 
         return {
+            idVoucher,
+            khuyenmai,
+            voucher,
+            checkedVoucher,
+            coupons,
+            visible,
+            showModal,
+            handleOk,
             data,
             columns,
             cart,
             formatCurrency,
             total,
-            ship,
-            giamgia,
-            voucher,
             updateQuantity,
             removeFromCart
 
@@ -153,3 +222,5 @@ export default defineComponent({
     },
 });
 </script>
+
+

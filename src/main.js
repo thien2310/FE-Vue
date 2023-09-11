@@ -2,7 +2,7 @@
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { Drawer, Button, message, List, Menu, Card, Table, Avatar, Select, Input, Checkbox, Popconfirm, Upload, Tree, Modal, Dropdown, Carousel, Breadcrumb, Badge, InputNumber,RadioGroup } from 'ant-design-vue';
+import { Drawer, Button, message, List, Menu, Card, Table, Avatar, Select, Input, Checkbox, Popconfirm, Upload, Tree, Modal, Dropdown, Carousel, Breadcrumb, Badge, InputNumber,Radio, Rate , Tabs, Switch, Result, DatePicker } from 'ant-design-vue';
 import CKEditor from '@ckeditor/ckeditor5-vue';
 
 import router from './router/index.js'
@@ -13,6 +13,9 @@ import 'bootstrap/dist/css/bootstrap-grid.min.css'
 import 'bootstrap/dist/css/bootstrap-utilities.min.css'
 // import 'bootstrap/dist/css/bootstrap.min.css'
 
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
 import 'ant-design-vue/dist/reset.css';
 import './static/fontawesome/css/all.min.css';
 
@@ -21,7 +24,12 @@ import { useCartStore } from './store/use-cart.js';
 
 const app = createApp(App);
 
-app.use(RadioGroup);
+app.use(DatePicker);
+app.use(Switch);
+app.use(Result);
+app.use(Rate);
+app.use(Radio);
+app.use(Tabs);
 app.use(InputNumber);
 app.use(Badge);
 app.use(Breadcrumb);
@@ -45,6 +53,7 @@ app.use(createPinia());
 app.use(Menu);
 app.use(Drawer);
 app.use(Button);
+app.use(VueSweetalert2);
 
 const cart = useCartStore();
 // cart.initializeCart();
